@@ -643,6 +643,25 @@ export async function handleMessage(
   const root = target ? (target.replyTo ?? target.id) : undefined;
   const app = lookingAt && madeApp(lookingAt) ? lookingAt : undefined;
   const mine = addMessage({ chatId, role: "user", text, replyTo: root, images: images?.length ? images : undefined, via, phone, channel, lookingAt: app, ...(member ? { member: saidOf(member) } : {}), ...(agent && !member && /^[A-Za-z0-9_]{1,40}$/.test(agent) ? { agent } : {}), ...(appNote && !member ? { appNote: true as const } : {}), ...(appNote && !member && picks?.length ? { picks } : {}) });
+  if (process.env.BOPS_SELF_HOSTED === "1" && process.env.NEXT_PUBLIC_BOPS_CHATGPT_OAUTH === "1") {
+    const botId = c.botIds[0];
+    let answer: string;
+    if (c.kind !== "bot" || via || member || onCall || phone || channel || lookingAt || agent || appNote) {
+      answer = "This ChatGPT connection supports direct chat with a bot in Bops.";
+    } else {
+      setTyping(chatId, botId, true);
+      try {
+        const { planAnswer } = await import("./chatgpt-plan");
+        answer = await planAnswer(history(chatId, botId), bot(botId)?.name ?? "Bops");
+      } catch (error) {
+        answer = error instanceof Error ? error.message : "ChatGPT could not complete this reply.";
+      } finally {
+        if (ours()) setTyping(chatId, botId, false);
+      }
+    }
+    if (ours()) addMessage({ chatId, role: "bot", botId, text: answer, replyTo: root });
+    return mine;
+  }
   trackServerEvent("bops_message_sent", { chat_kind: c.kind, via: onCall ? "call" : (via ?? "app"), image_count: images?.length ?? 0, is_reply: !!root });
   // Into the shared memory (unless the user wants it kept from someone), and remembered if it's a lasting fact. A
   // member's words go in as theirs, so nothing they say about themselves is taken for the owner.

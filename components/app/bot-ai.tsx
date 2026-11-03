@@ -244,7 +244,7 @@ function AgentEditor({
         <div role="group" aria-label="Pays with" className="flex shrink-0 gap-0.5 rounded-full bg-black/[0.05] p-[3px]">
           {PAYS_SHOWN[x.kind].map((p: AgentPays) => {
             const soon = PAYS_SOON[x.kind]?.[p];
-            const name = p === "plan" ? (x.kind === "codex" ? "OpenAI plan" : x.pays === "plan" && acct?.signIns?.[0]?.account?.plan ? `${upper(acct.signIns[0].account.plan)} plan` : "Claude plan") : p === "key" ? "Your key" : PAYS_NAMES[p];
+            const name = p === "plan" ? (x.kind === "codex" ? "ChatGPT plan" : x.pays === "plan" && acct?.signIns?.[0]?.account?.plan ? `${upper(acct.signIns[0].account.plan)} plan` : "Claude plan") : p === "key" ? "Your key" : PAYS_NAMES[p];
             const off = ro || busy || !!soon || x.kind === "bops";
             return (
               <button
@@ -649,7 +649,7 @@ export function BotAiSection({
           </div>
           {shared && <SharedWarning bot={b} words={shared} ro={ro || workBot(b, state.bots).id === b.id} />}
           <span className={quiet}>
-            {BRAINS_ON ? `Each thread runs on the agent you pick, with ${b.name}'s own accounts. Chat, memory and calls stay on credit.` : "Chat, threads, memory and calls run on credit."}
+            {process.env.NEXT_PUBLIC_BOPS_CHATGPT_OAUTH === "1" ? "Direct bot chat uses your ChatGPT connection. Pick a task agent separately." : BRAINS_ON ? `Each thread runs on the agent you pick, with ${b.name}'s own accounts. Chat, memory and calls stay on credit.` : "Chat, threads, memory and calls run on credit."}
             {BRAINS_ON && where === "some" ? " Threads on your Mac use Bops agent." : ""}
           </span>
           {ro && (

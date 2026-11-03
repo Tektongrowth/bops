@@ -1825,6 +1825,8 @@ function SelfHosting({ state }: { state: AppState }) {
         <span className="text-[12.5px] leading-[17px] text-[#6B6B6B]">Your own provider accounts, set in .env.local. The hosted Bops runs these for its users.</span>
       </div>
 
+      {process.env.NEXT_PUBLIC_BOPS_CHATGPT_OAUTH === "1" && <a className="px-[22px] pt-4 text-sm underline" href="/api/chatgpt">Connect or manage ChatGPT</a>}
+
       <div className="flex flex-col gap-2 px-[22px] pt-4">
         <span className="text-[13px] font-semibold">Network</span>
         <div className="flex gap-2.5">

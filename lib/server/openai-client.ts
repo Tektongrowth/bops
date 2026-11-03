@@ -31,6 +31,8 @@ export function openaiClient(opts: Omit<ClientOptions, "apiKey" | "defaultHeader
     apiKey: async () => {
       const via = cloudProxy("openai");
       if (via) return via.key;
+      if (process.env.BOPS_SELF_HOSTED === "1" && process.env.NEXT_PUBLIC_BOPS_CHATGPT_OAUTH === "1")
+        throw new OpenAI.OpenAIError("This feature needs a separate provider. The local pilot uses ChatGPT OAuth for direct bot chat.");
       const key = process.env.OPENAI_API_KEY;
       if (!key) throw new OpenAI.OpenAIError(process.env.BOPS_SELF_HOSTED === "1" ? "No OpenAI key is set: add OPENAI_API_KEY to .env.local." : "Sign in with Orgo first.");
       return key;
